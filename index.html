@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=0">
+    <title>TAF Progressão Mensal</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TAF Elite">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2936/2936886.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root { --ios-blue: #007AFF; --ios-bg: #F2F2F7; }
+        body { 
+            background-color: var(--ios-bg);
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .ios-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 16px;
+            border: 0.5px solid rgba(0,0,0,0.1);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: iosSlide 0.3s ease-out; }
+        .active-day { color: var(--ios-blue); font-weight: 700; border-bottom: 3px solid var(--ios-blue); }
+        
+        input[type="checkbox"] {
+            -webkit-appearance: none;
+            width: 22px; height: 22px;
+            border: 2px solid #C7C7CC;
+            border-radius: 50%;
+            position: relative;
+        }
+        input[type="checkbox"]:checked { background-color: #34C759; border-color: #34C759; }
+        input[type="checkbox"]:checked::after {
+            content: '✔'; position: absolute; left: 4px; top: -1px; color: white; font-size: 14px;
+        }
+        input[type="checkbox"]:checked + span { text-decoration: line-through; color: #8E8E93; }
+
+        @keyframes iosSlide { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        nav::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="font-sans antialiased">
+
+    <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 pt-4 pb-2 px-4">
+        <div class="flex justify-between items-center mb-3">
+            <h1 class="text-[17px] font-bold tracking-tight">Cronograma Mensal</h1>
+            <select id="weekSelector" onchange="updateWeek()" class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full border-none focus:ring-2 focus:ring-blue-500">
+                <option value="1">SEMANA 1 - FUNDAÇÃO</option>
+                <option value="2">SEMANA 2 - PROGRESSÃO</option>
+                <option value="3">SEMANA 3 - INTENSIDADE</option>
+                <option value="4">SEMANA 4 - DELOAD</option>
+            </select>
+        </div>
+        <nav class="flex overflow-x-auto space-x-5 text-[13px] text-gray-500 font-medium no-scrollbar">
+            <button onclick="openDay(event, 'seg')" class="day-link pb-2 active-day">SEG</button>
+            <button onclick="openDay(event, 'ter')" class="day-link pb-2">TER</button>
+            <button onclick="openDay(event, 'qua')" class="day-link pb-2">QUA</button>
+            <button onclick="openDay(event, 'qui')" class="day-link pb-2">QUI</button>
+            <button onclick="openDay(event, 'sex')" class="day-link pb-2">SEX</button>
+            <button onclick="openDay(event, 'sab')" class="day-link pb-2">SAB</button>
+            <button onclick="openDay(event, 'dom')" class="day-link pb-2">DOM</button>
+            <button onclick="openDay(event, 'score')" class="day-link pb-2 text-red-500 font-bold">SCORE</button>
+        </nav>
+    </header>
+
+    <main id="mainContent" class="p-4 pb-32">
+        </main>
+
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-black/90 text-white px-6 py-3 rounded-full flex items-center space-x-6 shadow-2xl z-50 border border-white/10 backdrop-blur-md">
+        <div class="text-center">
+            <span id="display" class="text-xl font-mono tracking-tighter">15:00</span>
+        </div>
+        <div class="h-6 w-[1px] bg-white/20"></div>
+        <button onclick="toggleTimer()" id="btn-timer" class="text-xs font-bold text-blue-400 uppercase">Iniciar</button>
+    </div>
+
+    <script>
+        const treinos = {
+            1: {
+                name: "Semana 1 - Fundação",
+                timer: "15:00",
+                seg: { foco: "Força + Resistência", detail: "AMRAP 15 min [cite: 8]", ex: ["Remo/Corrida 250m", "Agachamento Goblet 20 rep", "Flexões 10-15", "Farmer's Walk 50m"], rpe: "RPE 7-8/10 [cite: 8]" },
+                ter: { foco: "Capacidade Aeróbica", detail: "Intervalado [cite: 8]", ex: ["Aquecimento 5 min", "3' moderado / 2' rápido / 1' caminhada", "Repetir 4-5x"], rpe: "RPE 6-8/10 [cite: 8]" },
+                scoreFields: ["Rounds AMRAP Seg", "Distância Ter", "Tempo Quarta", "Peso Sab"]
+            },
+            2: {
+                name: "Semana 2 - Progressão",
+                timer: "18:00",
+                seg: { foco: "Força + Resistência", detail: "AMRAP 18 min [cite: 11]", ex: ["Remo/Corrida 300m", "Agachamento Frontal (Halt) 15 rep", "Flexões pés elevados 12-15", "Suitcase Carry 50m/lado"], rpe: "RPE 8/10 - Aumentar carga 5% [cite: 11]" },
+                ter: { foco: "Intervalado Progressivo", detail: "Ciclos Longos [cite: 11]", ex: ["Aquecimento 5 min", "4' moderado / 2' rápido / 1' caminhada", "Repetir 4-5x"], rpe: "RPE 7-9/10 [cite: 11]" },
+                scoreFields: ["Rounds AMRAP Seg (18m)", "Tempo Arnold Press", "Peso Búlgaro", "Carga Suitcase Carry"]
+            },
+            3: {
+                name: "Semana 3 - Intensificação",
+                timer: "20:00",
+                seg: { foco: "Força + Intensidade", detail: "AMRAP 20 min [cite: 13]", ex: ["Remo/Corrida 400m", "Agachamento com Caixa 12 rep", "Flexões Diamante 10-12", "Overhead Carry 50m"], rpe: "RPE 8-9/10 [cite: 13]" },
+                ter: { foco: "Intervalado Avançado", detail: "Ciclos Intensos [cite: 13]", ex: ["Aquecimento 5 min", "5' moderado / 3' rápido / 1' caminhada", "Repetir 4x"], rpe: "RPE 8-9/10 [cite: 13]" },
+                scoreFields: ["Rounds AMRAP Seg (20m)", "Tempo Chipper Quinta", "Peso Supino 5x5", "Carga Overhead Carry"]
+            },
+            4: {
+                name: "Semana 4 - Deload",
+                timer: "10:00",
+                seg: { foco: "Força Leve", detail: "Técnica (50% carga) [cite: 18]", ex: ["Agachamento Goblet 3x10", "Flexões lentas (3-1-1-1) 3x8", "Remada TRX 3x12", "Caminhada 20 min"], rpe: "RPE 5-6/10 [cite: 18]" },
+                ter: { foco: "Aeróbico Leve", detail: "Zona 2 Contínua [cite: 18]", ex: ["Corrida/Caminhada 30 min", "Manter FC Conversacional"], rpe: "RPE 4-5/10 [cite: 18]" },
+                scoreFields: ["Sensação Recuperação", "Qualidade Técnica", "Nível de Fadiga"]
+            }
+        };
+
+        let currentWeek = 1;
+        let currentDay = 'seg';
+
+        function updateWeek() {
+            currentWeek = document.getElementById('weekSelector').value;
+            renderContent();
+            resetTimer(treinos[currentWeek].timer);
+        }
+
+        function openDay(evt, day) {
+            currentDay = day;
+            const links = document.getElementsByClassName("day-link");
+            for (let link of links) link.classList.remove("active-day");
+            evt.currentTarget.classList.add("active-day");
+            renderContent();
+            window.scrollTo({top: 0, behavior: 'smooth'});
+        }
+
+        function renderContent() {
+            const container = document.getElementById('mainContent');
+            const weekData = treinos[currentWeek];
+            
+            if (currentDay === 'score') {
+                let fieldsHTML = weekData.scoreFields.map(f => `
+                    <div class="mb-4">
+                        <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">${f}</label>
+                        <input type="text" class="w-full bg-gray-50 border-none p-3 rounded-xl mt-1 text-sm focus:ring-2 focus:ring-blue-500" placeholder="Resultado...">
+                    </div>
+                `).join('');
+                
+                container.innerHTML = `
+                    <div class="ios-card p-5">
+                        <h2 class="text-red-500 font-bold text-lg mb-4 italic underline">Score - ${weekData.name}</h2>
+                        ${fieldsHTML}
+                        <div class="mt-6 pt-4 border-t border-gray-100">
+                            <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Anotações Gerais (Dificuldade, Sono, Fadiga)</label>
+                            <textarea class="w-full bg-gray-50 border-none p-3 rounded-xl mt-1 text-sm h-24 focus:ring-2 focus:ring-blue-500" placeholder="Como foi o treino hoje? Alguma dor aguda?"></textarea>
+                        </div>
+                        <button class="w-full bg-blue-500 text-white font-bold py-4 rounded-2xl mt-6 shadow-lg active:scale-95 transition-transform" onclick="alert('Dados da Semana ${currentWeek} salvos!')">Concluir Registro</button>
+                    </div>
+                `;
+            } else {
+                const dayData = weekData[currentDay] || { foco: "Treino em Construção", detail: "Aguardando planilha completa...", ex: [], rpe: "" };
+                container.innerHTML = `
+                    <div class="ios-card p-5">
+                        <h2 class="text-blue-600 font-bold text-lg mb-1">${dayData.foco}</h2>
+                        <p class="text-xs text-gray-400 mb-4 font-medium uppercase tracking-tight">${dayData.detail}</p>
+                        <div class="space-y-4">
+                            ${dayData.ex.map(item => `
+                                <label class="flex items-start space-x-3">
+                                    <input type="checkbox">
+                                    <span class="text-[15px] leading-tight text-gray-800">${item}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-gray-100">
+                            <p class="text-[11px] font-black text-blue-400 uppercase tracking-widest">${dayData.rpe}</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Lógica de Timer
+        let timeLeft = 15 * 60;
+        let timerId = null;
+
+        function resetTimer(timeStr) {
+            const [min, sec] = timeStr.split(':').map(Number);
+            timeLeft = min * 60 + sec;
+            document.getElementById('display').innerText = timeStr;
+            clearInterval(timerId);
+            timerId = null;
+            document.getElementById('btn-timer').innerText = "Iniciar";
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('btn-timer');
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+                btn.innerText = "Continuar";
+            } else {
+                btn.innerText = "Pausar";
+                timerId = setInterval(() => {
+                    if (timeLeft <= 0) { clearInterval(timerId); return; }
+                    timeLeft--;
+                    let mins = Math.floor(timeLeft / 60);
+                    let secs = timeLeft % 60;
+                    document.getElementById('display').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }, 1000);
+            }
+        }
+
+        // Inicializar
+        updateWeek();
+    </script>
+</body>
+</html>
