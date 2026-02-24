@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=0">
-    <title>TAF Progressão Mensal</title>
+    <title>TAF Elite Mensal</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -51,8 +51,8 @@
 
     <header class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200 pt-4 pb-2 px-4">
         <div class="flex justify-between items-center mb-3">
-            <h1 class="text-[17px] font-bold tracking-tight">Cronograma Mensal</h1>
-            <select id="weekSelector" onchange="updateWeek()" class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full border-none focus:ring-2 focus:ring-blue-500">
+            <h1 class="text-[17px] font-bold tracking-tight">TAF Delegado Federal</h1>
+            <select id="weekSelector" onchange="updateWeek()" class="bg-blue-50 text-blue-600 text-[12px] font-bold px-3 py-1 rounded-full border-none">
                 <option value="1">SEMANA 1 - FUNDAÇÃO</option>
                 <option value="2">SEMANA 2 - PROGRESSÃO</option>
                 <option value="3">SEMANA 3 - INTENSIDADE</option>
@@ -76,46 +76,65 @@
 
     <div class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-black/90 text-white px-6 py-3 rounded-full flex items-center space-x-6 shadow-2xl z-50 border border-white/10 backdrop-blur-md">
         <div class="text-center">
-            <span id="display" class="text-xl font-mono tracking-tighter">15:00</span>
+            <span id="display" class="text-xl font-mono tracking-tighter">00:00</span>
         </div>
         <div class="h-6 w-[1px] bg-white/20"></div>
-        <button onclick="toggleTimer()" id="btn-timer" class="text-xs font-bold text-blue-400 uppercase">Iniciar</button>
+        <button onclick="toggleTimer()" id="btn-timer" class="text-xs font-bold text-blue-400 uppercase tracking-widest">Iniciar</button>
     </div>
 
     <script>
         const treinos = {
             1: {
                 name: "Semana 1 - Fundação",
-                timer: "15:00",
-                seg: { foco: "Força + Resistência", detail: "AMRAP 15 min [cite: 8]", ex: ["Remo/Corrida 250m", "Agachamento Goblet 20 rep", "Flexões 10-15", "Farmer's Walk 50m"], rpe: "RPE 7-8/10 [cite: 8]" },
-                ter: { foco: "Capacidade Aeróbica", detail: "Intervalado [cite: 8]", ex: ["Aquecimento 5 min", "3' moderado / 2' rápido / 1' caminhada", "Repetir 4-5x"], rpe: "RPE 6-8/10 [cite: 8]" },
-                scoreFields: ["Rounds AMRAP Seg", "Distância Ter", "Tempo Quarta", "Peso Sab"]
+                timer: 900, // 15 min [cite: 8]
+                seg: { foco: "Força + Resistência", detail: "AMRAP 15 min", ex: ["Remo/Corrida 250m", "Agachamento Goblet 20 rep", "Flexões 10-15", "Farmer's Walk 50m"], rpe: "RPE 7-8/10" },
+                ter: { foco: "Capacidade Aeróbica", detail: "Intervalado", ex: ["Ciclos: 3' mod / 2' ráp / 1' cam", "Repetir 4-5x"], rpe: "RPE 6-8/10" },
+                qua: { foco: "Potência e Core", detail: "7 Rodadas", ex: ["Corrida 200m", "Push Press 15 rep", "Agach. Frontal 15 rep", "Remada TRX 15 rep"], rpe: "RPE 8-9/10" },
+                qui: { foco: "Resistência Muscular", detail: "EMOM", ex: ["16' remo/bike: 10 burpees a cada 2'", "Prancha 1' x3", "Elevação de Quadril 15 rep x3"], rpe: "RPE 7-8/10" },
+                sex: { foco: "Circuito Funcional", detail: "4 Rodadas", ex: ["Passadas 20 passos", "Wall Balls 15 rep", "Bear Crawl 12m", "Corrida 400m"], rpe: "RPE 8/10" },
+                sab: { foco: "Força Pura", detail: "Progressão Linear", ex: ["Supino Halt. 3x10-12", "Terra Romeno 3x10", "Z-Press 3x10", "Farmer Walk unilateral 30m"], rpe: "RPE 8-9/10" },
+                scoreFields: ["Rounds AMRAP Seg", "Distância Terça", "Tempo Quarta", "Carga Sábado"]
             },
             2: {
                 name: "Semana 2 - Progressão",
-                timer: "18:00",
-                seg: { foco: "Força + Resistência", detail: "AMRAP 18 min [cite: 11]", ex: ["Remo/Corrida 300m", "Agachamento Frontal (Halt) 15 rep", "Flexões pés elevados 12-15", "Suitcase Carry 50m/lado"], rpe: "RPE 8/10 - Aumentar carga 5% [cite: 11]" },
-                ter: { foco: "Intervalado Progressivo", detail: "Ciclos Longos [cite: 11]", ex: ["Aquecimento 5 min", "4' moderado / 2' rápido / 1' caminhada", "Repetir 4-5x"], rpe: "RPE 7-9/10 [cite: 11]" },
-                scoreFields: ["Rounds AMRAP Seg (18m)", "Tempo Arnold Press", "Peso Búlgaro", "Carga Suitcase Carry"]
+                timer: 1080, // 18 min [cite: 11]
+                seg: { foco: "Força + Resistência", detail: "AMRAP 18 min", ex: ["Remo/Corrida 300m", "Agach. Frontal Halt. 15 rep", "Flexões pés elevados 12-15", "Suitcase Carry 50m/lado"], rpe: "RPE 8/10" },
+                ter: { foco: "Intervalado Progressivo", detail: "Ciclos: 4' mod / 2' ráp / 1' cam", ex: ["Repetir 4-5x", "Aquecimento 5 min"], rpe: "RPE 7-9/10" },
+                qua: { foco: "Potência e Core", detail: "7 Rodadas", ex: ["Corrida 200m", "Arnold Press 12 rep", "Agach. Búlgaro 10 rep/lado", "Remada curvada larga 15 rep"], rpe: "RPE 8-9/10" },
+                qui: { foco: "Resistência Muscular", detail: "EMOM 20 min", ex: ["Min 0-2: Remo 250m", "Min 2-4: 12 Burpees", "Min 4-6: Bike 300m", "Prancha lateral 45s x3"], rpe: "RPE 8/10" },
+                sex: { foco: "Circuito Funcional", detail: "5 Rodadas", ex: ["Afundo reverência 16 rep", "Thrusters c/ halteres 12 rep", "Crawl lateral 12m", "Corrida 400m"], rpe: "RPE 8-9/10" },
+                sab: { foco: "Força Pura", detail: "Aumentar carga 5-10%", ex: ["Supino inclinado 3x8-10", "Terra convencional 4x6-8", "Desenvolv. barra sentado 3x8", "Farmer Walk bilateral 40m"], rpe: "RPE 8-9/10" },
+                scoreFields: ["Rounds AMRAP Seg", "Km Terça", "Tempo Sexta", "Cargas Sábado"]
             },
             3: {
                 name: "Semana 3 - Intensificação",
-                timer: "20:00",
-                seg: { foco: "Força + Intensidade", detail: "AMRAP 20 min [cite: 13]", ex: ["Remo/Corrida 400m", "Agachamento com Caixa 12 rep", "Flexões Diamante 10-12", "Overhead Carry 50m"], rpe: "RPE 8-9/10 [cite: 13]" },
-                ter: { foco: "Intervalado Avançado", detail: "Ciclos Intensos [cite: 13]", ex: ["Aquecimento 5 min", "5' moderado / 3' rápido / 1' caminhada", "Repetir 4x"], rpe: "RPE 8-9/10 [cite: 13]" },
-                scoreFields: ["Rounds AMRAP Seg (20m)", "Tempo Chipper Quinta", "Peso Supino 5x5", "Carga Overhead Carry"]
+                timer: 1200, // 20 min [cite: 13]
+                seg: { foco: "Força + Resistência", detail: "AMRAP 20 min", ex: ["Remo/Corrida 400m", "Agach. com caixa 12 rep", "Flexões diamante 10-12", "Overhead Carry 50m"], rpe: "RPE 8-9/10" },
+                ter: { foco: "Intervalado Avançado", detail: "Ciclos: 5' mod / 3' ráp / 1' cam", ex: ["Repetir 4x", "Aquecimento 5 min"], rpe: "RPE 8-9/10" },
+                qua: { foco: "Potência e Core", detail: "8 Rodadas", ex: ["Corrida 200m", "Push Jerk 12 rep", "Pistol Squat (assistido) 8/lado", "Puxada lat supinada 12 rep"], rpe: "RPE 9/10" },
+                qui: { foco: "Resistência Muscular", detail: "Chipper", ex: ["800m remo", "50 Burpees", "800m bike", "40 Mountain Climbers"], rpe: "RPE 8-9/10" },
+                sex: { foco: "Circuito Funcional", detail: "5 Rodadas", ex: ["Step-up russo 16 rep", "Devil Press 10 rep", "Inchworm 10 rep", "Corrida 500m"], rpe: "RPE 9/10" },
+                sab: { foco: "Força Máxima", detail: "5x5 Progressão Pesada", ex: ["Supino barra 5x5", "Terra Romeno 4x8", "Press militar barra 4x6", "Farmer Walk pesado 50m"], rpe: "RPE 9/10" },
+                scoreFields: ["Rounds AMRAP Seg", "Tempo Chipper", "Tempo Sexta", "Teste 1RM Sab"]
             },
             4: {
                 name: "Semana 4 - Deload",
-                timer: "10:00",
-                seg: { foco: "Força Leve", detail: "Técnica (50% carga) [cite: 18]", ex: ["Agachamento Goblet 3x10", "Flexões lentas (3-1-1-1) 3x8", "Remada TRX 3x12", "Caminhada 20 min"], rpe: "RPE 5-6/10 [cite: 18]" },
-                ter: { foco: "Aeróbico Leve", detail: "Zona 2 Contínua [cite: 18]", ex: ["Corrida/Caminhada 30 min", "Manter FC Conversacional"], rpe: "RPE 4-5/10 [cite: 18]" },
-                scoreFields: ["Sensação Recuperação", "Qualidade Técnica", "Nível de Fadiga"]
+                timer: 600, // 10 min [cite: 18]
+                seg: { foco: "Força Leve", detail: "Técnica e Controle", ex: ["Agach. Goblet 3x10 (50%)", "Flexões lentas 3x8", "Remada TRX 3x12", "Caminhada 20 min"], rpe: "RPE 5-6/10" },
+                ter: { foco: "Aeróbico Leve", detail: "Zona 2 Contínua", ex: ["Corrida/Caminhada 30 min", "FC Conversação confortável"], rpe: "RPE 4-5/10" },
+                qua: { foco: "Mobilidade Ativa", detail: "4 Rodadas leves", ex: ["Corrida 200m", "Push Press 3x8 (50%)", "Agach. peso corporal 10 rep", "Prancha 30s"], rpe: "RPE 5/10" },
+                qui: { foco: "Recuperação Ativa", detail: "Ritmo muito leve", ex: ["Remo/Bike 10 min", "Mobilidade articular 15 min", "Alongamento estático 15 min"], rpe: "RPE 3-4/10" },
+                sex: { foco: "Circuito Leve", detail: "2 Rodadas", ex: ["Passadas 15 passos", "Wall Balls 10 rep (leve)", "Bear Crawl 10m", "Caminhada 400m"], rpe: "RPE 5-6/10" },
+                sab: { foco: "Força Técnica", detail: "60% carga", ex: ["Supino 3x8", "Terra 3x5", "Z-Press 3x8", "Mobilidade de ombro 10 min"], rpe: "RPE 5-6/10" },
+                scoreFields: ["Nível Fadiga (1-10)", "Qualidade Sono", "Dores Articulares"]
             }
         };
 
         let currentWeek = 1;
         let currentDay = 'seg';
+        let timerInterval = null;
+        let endTime = null;
+        let remainingSeconds = 0;
 
         function updateWeek() {
             currentWeek = document.getElementById('weekSelector').value;
@@ -150,13 +169,23 @@
                         ${fieldsHTML}
                         <div class="mt-6 pt-4 border-t border-gray-100">
                             <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Anotações Gerais (Dificuldade, Sono, Fadiga)</label>
-                            <textarea class="w-full bg-gray-50 border-none p-3 rounded-xl mt-1 text-sm h-24 focus:ring-2 focus:ring-blue-500" placeholder="Como foi o treino hoje? Alguma dor aguda?"></textarea>
+                            <textarea class="w-full bg-gray-50 border-none p-3 rounded-xl mt-1 text-sm h-24 focus:ring-2 focus:ring-blue-500" placeholder="Registre como se sentiu hoje."></textarea>
                         </div>
-                        <button class="w-full bg-blue-500 text-white font-bold py-4 rounded-2xl mt-6 shadow-lg active:scale-95 transition-transform" onclick="alert('Dados da Semana ${currentWeek} salvos!')">Concluir Registro</button>
+                        <button class="w-full bg-blue-500 text-white font-bold py-4 rounded-2xl mt-6 shadow-lg active:scale-95 transition-transform" onclick="alert('Salvo!')">Salvar Registro</button>
+                    </div>
+                `;
+            } else if (currentDay === 'dom') {
+                container.innerHTML = `
+                    <div class="ios-card p-6 border-2 border-green-500 bg-green-50/50">
+                        <h2 class="text-green-700 font-bold text-center text-xl mb-4 italic">Recuperação Ativa</h2>
+                        <p class="text-sm text-center mb-4">Zona 2: 30-40 min [cite: 9, 12, 15, 19]</p>
+                        <div class="space-y-2 text-xs text-green-900 bg-white/50 p-3 rounded-xl">
+                            <p>🧘 <strong>Mobilidade (15 min):</strong> Sofá stretch, pombo e dobra à frente. [cite: 9]</p>
+                        </div>
                     </div>
                 `;
             } else {
-                const dayData = weekData[currentDay] || { foco: "Treino em Construção", detail: "Aguardando planilha completa...", ex: [], rpe: "" };
+                const dayData = weekData[currentDay];
                 container.innerHTML = `
                     <div class="ios-card p-5">
                         <h2 class="text-blue-600 font-bold text-lg mb-1">${dayData.foco}</h2>
@@ -169,7 +198,7 @@
                                 </label>
                             `).join('')}
                         </div>
-                        <div class="mt-6 pt-4 border-t border-gray-100">
+                        <div class="mt-6 pt-4 border-t border-gray-100 text-center">
                             <p class="text-[11px] font-black text-blue-400 uppercase tracking-widest">${dayData.rpe}</p>
                         </div>
                     </div>
@@ -177,38 +206,54 @@
             }
         }
 
-        // Lógica de Timer
-        let timeLeft = 15 * 60;
-        let timerId = null;
+        // Lógica de Timer Persistente para iOS
+        function formatTime(sec) {
+            let m = Math.floor(sec / 60);
+            let s = sec % 60;
+            return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+        }
 
-        function resetTimer(timeStr) {
-            const [min, sec] = timeStr.split(':').map(Number);
-            timeLeft = min * 60 + sec;
-            document.getElementById('display').innerText = timeStr;
-            clearInterval(timerId);
-            timerId = null;
+        function resetTimer(seconds) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            remainingSeconds = seconds;
+            endTime = null;
+            document.getElementById('display').innerText = formatTime(remainingSeconds);
             document.getElementById('btn-timer').innerText = "Iniciar";
         }
 
         function toggleTimer() {
             const btn = document.getElementById('btn-timer');
-            if (timerId) {
-                clearInterval(timerId);
-                timerId = null;
+            if (timerInterval) {
+                // Pausar
+                clearInterval(timerInterval);
+                timerInterval = null;
+                remainingSeconds = Math.round((endTime - Date.now()) / 1000);
+                endTime = null;
                 btn.innerText = "Continuar";
             } else {
+                // Iniciar/Continuar
+                endTime = Date.now() + (remainingSeconds * 1000);
+                timerInterval = setInterval(updateTimerDisplay, 100);
                 btn.innerText = "Pausar";
-                timerId = setInterval(() => {
-                    if (timeLeft <= 0) { clearInterval(timerId); return; }
-                    timeLeft--;
-                    let mins = Math.floor(timeLeft / 60);
-                    let secs = timeLeft % 60;
-                    document.getElementById('display').innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                }, 1000);
             }
         }
 
-        // Inicializar
+        function updateTimerDisplay() {
+            let now = Date.now();
+            let diff = Math.round((endTime - now) / 1000);
+            
+            if (diff <= 0) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                diff = 0;
+                document.getElementById('btn-timer').innerText = "Fim";
+                alert("Tempo esgotado!");
+            }
+            document.getElementById('display').innerText = formatTime(diff);
+        }
+
+        // Inicializar app
         updateWeek();
     </script>
 </body>
