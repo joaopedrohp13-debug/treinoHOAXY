@@ -43,6 +43,13 @@
         }
         input[type="checkbox"]:checked + span { text-decoration: line-through; color: #8E8E93; }
 
+        /* Estilo para o input de tempo escondido */
+        #time-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
         @keyframes iosSlide { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         nav::-webkit-scrollbar { display: none; }
     </style>
@@ -72,11 +79,13 @@
     </header>
 
     <main id="mainContent" class="p-4 pb-32">
-        </main>
+    </main>
 
     <div class="fixed bottom-8 left-1/2 -translate-x-1/2 bg-black/90 text-white px-6 py-3 rounded-full flex items-center space-x-6 shadow-2xl z-50 border border-white/10 backdrop-blur-md">
-        <div class="text-center">
-            <span id="display" class="text-xl font-mono tracking-tighter">00:00</span>
+        <div class="text-center active:opacity-50" onclick="manualAdjust()">
+            <input type="time" id="time-input" onchange="setTimeFromInput(this.value)">
+            <span id="display" class="text-xl font-mono tracking-tighter cursor-pointer">00:00</span>
+            <div class="text-[8px] uppercase opacity-40 leading-none">Ajustar</div>
         </div>
         <div class="h-6 w-[1px] bg-white/20"></div>
         <button onclick="toggleTimer()" id="btn-timer" class="text-xs font-bold text-blue-400 uppercase tracking-widest">Iniciar</button>
@@ -86,8 +95,8 @@
         const treinos = {
             1: {
                 name: "Semana 1 - Fundação",
-                timer: 900, // 35 min [cite: 8]
-                seg: { foco: "Força + Resistência", detail: "AMRAP 35 min", ex: ["Remo/Corrida 500m", "Agachamento Goblet 20 rep", "Flexões 10-15", "Farmer's Walk 50m"], rpe: "RPE 7-8/10" },
+                [cite_start]timer: 900, // 15 min [cite: 8]
+                seg: { foco: "Força + Resistência", detail: "AMRAP 15 min", ex: ["Remo/Corrida 250m", "Agachamento Goblet 20 rep", "Flexões 10-15", "Farmer's Walk 50m"], rpe: "RPE 7-8/10" },
                 ter: { foco: "Capacidade Aeróbica", detail: "Intervalado", ex: ["Ciclos: 3' mod / 2' ráp / 1' cam", "Repetir 4-5x"], rpe: "RPE 6-8/10" },
                 qua: { foco: "Potência e Core", detail: "7 Rodadas", ex: ["Corrida 200m", "Push Press 15 rep", "Agach. Frontal 15 rep", "Remada TRX 15 rep"], rpe: "RPE 8-9/10" },
                 qui: { foco: "Resistência Muscular", detail: "EMOM", ex: ["16' remo/bike: 10 burpees a cada 2'", "Prancha 1' x3", "Elevação de Quadril 15 rep x3"], rpe: "RPE 7-8/10" },
@@ -97,19 +106,19 @@
             },
             2: {
                 name: "Semana 2 - Progressão",
-                timer: 1080, // 40 min [cite: 11]
-                seg: { foco: "Força + Resistência", detail: "AMRAP 40 min", ex: ["Remo/Corrida 750m", "Agach. Frontal Halt. 15 rep", "Flexões pés elevados 12-15", "Suitcase Carry 50m/lado"], rpe: "RPE 8/10" },
+                [cite_start]timer: 1080, // 18 min [cite: 11]
+                seg: { foco: "Força + Resistência", detail: "AMRAP 18 min", ex: ["Remo/Corrida 300m", "Agach. Frontal Halt. 15 rep", "Flexões pés elevados 12-15", "Suitcase Carry 50m/lado"], rpe: "RPE 8/10" },
                 ter: { foco: "Intervalado Progressivo", detail: "Ciclos: 4' mod / 2' ráp / 1' cam", ex: ["Repetir 4-5x", "Aquecimento 5 min"], rpe: "RPE 7-9/10" },
                 qua: { foco: "Potência e Core", detail: "7 Rodadas", ex: ["Corrida 200m", "Arnold Press 12 rep", "Agach. Búlgaro 10 rep/lado", "Remada curvada larga 15 rep"], rpe: "RPE 8-9/10" },
-                qui: { foco: "Resistência Muscular", detail: "EMOM 35 min", ex: ["Min 0-2: Remo 250m", "Min 2-4: 12 Burpees", "Min 4-6: Bike 300m", "Prancha lateral 45s x3"], rpe: "RPE 8/10" },
+                qui: { foco: "Resistência Muscular", detail: "EMOM 20 min", ex: ["Min 0-2: Remo 250m", "Min 2-4: 12 Burpees", "Min 4-6: Bike 300m", "Prancha lateral 45s x3"], rpe: "RPE 8/10" },
                 sex: { foco: "Circuito Funcional", detail: "5 Rodadas", ex: ["Afundo reverência 16 rep", "Thrusters c/ halteres 12 rep", "Crawl lateral 12m", "Corrida 400m"], rpe: "RPE 8-9/10" },
                 sab: { foco: "Força Pura", detail: "Aumentar carga 5-10%", ex: ["Supino inclinado 3x8-10", "Terra convencional 4x6-8", "Desenvolv. barra sentado 3x8", "Farmer Walk bilateral 40m"], rpe: "RPE 8-9/10" },
                 scoreFields: ["Rounds AMRAP Seg", "Km Terça", "Tempo Sexta", "Cargas Sábado"]
             },
             3: {
                 name: "Semana 3 - Intensificação",
-                timer: 1200, // 45 min [cite: 13]
-                seg: { foco: "Força + Resistência", detail: "AMRAP 45 min", ex: ["Remo/Corrida 1000m", "Agach. com caixa 12 rep", "Flexões diamante 10-12", "Overhead Carry 50m"], rpe: "RPE 8-9/10" },
+                [cite_start]timer: 1200, // 20 min [cite: 13]
+                seg: { foco: "Força + Resistência", detail: "AMRAP 20 min", ex: ["Remo/Corrida 400m", "Agach. com caixa 12 rep", "Flexões diamante 10-12", "Overhead Carry 50m"], rpe: "RPE 8-9/10" },
                 ter: { foco: "Intervalado Avançado", detail: "Ciclos: 5' mod / 3' ráp / 1' cam", ex: ["Repetir 4x", "Aquecimento 5 min"], rpe: "RPE 8-9/10" },
                 qua: { foco: "Potência e Core", detail: "8 Rodadas", ex: ["Corrida 200m", "Push Jerk 12 rep", "Pistol Squat (assistido) 8/lado", "Puxada lat supinada 12 rep"], rpe: "RPE 9/10" },
                 qui: { foco: "Resistência Muscular", detail: "Chipper", ex: ["800m remo", "50 Burpees", "800m bike", "40 Mountain Climbers"], rpe: "RPE 8-9/10" },
@@ -119,11 +128,11 @@
             },
             4: {
                 name: "Semana 4 - Deload",
-                timer: 600, // 30 min [cite: 18]
-                seg: { foco: "Força Leve", detail: "Técnica e Controle", ex: ["Agach. Goblet 3x10 (50%)", "Flexões lentas 3x8", "Remada TRX 3x12", "Caminhada 30 min"], rpe: "RPE 5-6/10" },
-                ter: { foco: "Aeróbico Leve", detail: "Zona 2 Contínua", ex: ["Corrida/Caminhada 40 min", "FC Conversação confortável"], rpe: "RPE 4-5/10" },
+                [cite_start]timer: 600, // 10 min [cite: 18]
+                seg: { foco: "Força Leve", detail: "Técnica e Controle", ex: ["Agach. Goblet 3x10 (50%)", "Flexões lentas 3x8", "Remada TRX 3x12", "Caminhada 20 min"], rpe: "RPE 5-6/10" },
+                ter: { foco: "Aeróbico Leve", detail: "Zona 2 Contínua", ex: ["Corrida/Caminhada 30 min", "FC Conversação confortável"], rpe: "RPE 4-5/10" },
                 qua: { foco: "Mobilidade Ativa", detail: "4 Rodadas leves", ex: ["Corrida 200m", "Push Press 3x8 (50%)", "Agach. peso corporal 10 rep", "Prancha 30s"], rpe: "RPE 5/10" },
-                qui: { foco: "Recuperação Ativa", detail: "Ritmo muito leve", ex: ["Remo/Bike 10 min", "Mobilidade articular 35 min", "Alongamento estático 35 min"], rpe: "RPE 3-4/10" },
+                qui: { foco: "Recuperação Ativa", detail: "Ritmo muito leve", ex: ["Remo/Bike 10 min", "Mobilidade articular 15 min", "Alongamento estático 15 min"], rpe: "RPE 3-4/10" },
                 sex: { foco: "Circuito Leve", detail: "2 Rodadas", ex: ["Passadas 15 passos", "Wall Balls 10 rep (leve)", "Bear Crawl 10m", "Caminhada 400m"], rpe: "RPE 5-6/10" },
                 sab: { foco: "Força Técnica", detail: "60% carga", ex: ["Supino 3x8", "Terra 3x5", "Z-Press 3x8", "Mobilidade de ombro 10 min"], rpe: "RPE 5-6/10" },
                 scoreFields: ["Nível Fadiga (1-10)", "Qualidade Sono", "Dores Articulares"]
@@ -178,9 +187,9 @@
                 container.innerHTML = `
                     <div class="ios-card p-6 border-2 border-green-500 bg-green-50/50">
                         <h2 class="text-green-700 font-bold text-center text-xl mb-4 italic">Recuperação Ativa</h2>
-                        <p class="text-sm text-center mb-4">Zona 2: 30-45 min [cite: 9, 12, 15, 19]</p>
+                        [cite_start]<p class="text-sm text-center mb-4">Zona 2: 30-45 min [cite: 9, 12, 15, 19]</p>
                         <div class="space-y-2 text-xs text-green-900 bg-white/50 p-3 rounded-xl">
-                            <p>🧘 <strong>Mobilidade (35 min):</strong> Sofá stretch, pombo e dobra à frente. [cite: 9]</p>
+                            [cite_start]<p>🧘 <strong>Mobilidade (15 min):</strong> Sofá stretch, pombo e dobra à frente. [cite: 9]</p>
                         </div>
                     </div>
                 `;
@@ -206,6 +215,19 @@
             }
         }
 
+        // Funções de Ajuste Manual
+        function manualAdjust() {
+            if (!timerInterval) {
+                document.getElementById('time-input').showPicker();
+            }
+        }
+
+        function setTimeFromInput(val) {
+            const parts = val.split(':');
+            const totalSec = (parseInt(parts[0]) * 60) + parseInt(parts[1]);
+            resetTimer(totalSec);
+        }
+
         // Lógica de Timer Persistente para iOS
         function formatTime(sec) {
             let m = Math.floor(sec / 60);
@@ -225,14 +247,13 @@
         function toggleTimer() {
             const btn = document.getElementById('btn-timer');
             if (timerInterval) {
-                // Pausar
                 clearInterval(timerInterval);
                 timerInterval = null;
                 remainingSeconds = Math.round((endTime - Date.now()) / 1000);
                 endTime = null;
                 btn.innerText = "Continuar";
             } else {
-                // Iniciar/Continuar
+                if (remainingSeconds <= 0) return;
                 endTime = Date.now() + (remainingSeconds * 1000);
                 timerInterval = setInterval(updateTimerDisplay, 100);
                 btn.innerText = "Pausar";
@@ -253,7 +274,6 @@
             document.getElementById('display').innerText = formatTime(diff);
         }
 
-        // Inicializar app
         updateWeek();
     </script>
 </body>
